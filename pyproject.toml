@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "plants-api"
+version = "0.1.0"
+description = ""
+license = "MIT"
+authors = ["Liz Dahlstrom"]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.109.2"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+mypy = "^1.8.0"
+black = "^24.1.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
