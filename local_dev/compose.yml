@@ -1,0 +1,78 @@
+---
+name: plants-api
+
+services:
+  app:
+    container_name: app
+    build:
+      context: ..
+      dockerfile: local_dev/Dockerfile
+    command: poetry run uvicorn main:app --host 0.0.0.0 --port 8000
+    working_dir: /app/plants_api
+    develop:
+      watch:
+        - path: ../plants_api
+          action: sync
+          target: app/plants_api
+        - path: ../tests
+          action: sync
+          target: app/tests
+    environment:
+      POSTGRES_USER: postgres
+      # POSTGRES_PASSWORD: /run/secrets/db_password
+      POSTGRES_PASSWORD: postgres
+
+    # secrets:
+      # - db_password
+    ports:
+      - target: 8000 # container
+        published: 8001 # host machine
+        protocol: tcp
+        mode: host
+    restart: always
+    depends_on:
+      - db
+
+  db:
+    container_name: db
+    image: bitnami/postgresql:latest
+    restart: always
+    # user: "1001:0" # Colima won't mount the data directory without this
+    environment:
+      POSTGRESQL_USERNAME: postgres
+      POSTGRESQL_PASSWORD: postgres
+      POSTGRESQL_DATABASE: app
+    healthcheck:
+      test:
+        - CMD
+        - pg_isready
+        - --dbname=app
+        - --quiet
+        - --username=postgres
+      interval: 15s
+      timeout: 5s
+      retries: 6
+    # secrets:
+    #   - db_password
+    ports:
+      - '5432:5432'
+    volumes: 
+      - type: bind
+        source: "./db/data"
+        target: "/var/lib/postgres/data"
+        read_only: false
+    #   - "/var/run/postgres/postgres.sock:/var/run/postgres/postgres.sock"
+    #   - ./data:/var/lib/postgresql/data
+    #   - ./db:/bitnami/postgresql
+    #   I think it's trying to change the ownership of my host /var/lib/postgresql/data - not sure why
+    #   - ./db/entrypoint:/docker-entrypoint-initdb.d
+
+# volumes:
+#   db:
+#     driver: local
+
+# secrets:
+#    db_password:
+#      file: db_password.txt
+#    db_root_password:
+#      file: local_dev/db_root_password.txt
