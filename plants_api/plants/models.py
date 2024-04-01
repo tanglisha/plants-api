@@ -1,9 +1,11 @@
 import logging
 from typing import TYPE_CHECKING
 from unittest.mock import Base
+import pg8000
 from pydantic import UUID4, computed_field
 from pytest import param
-from sqlalchemy import String
+from sqlalchemy import Column, String
+from sqlalchemy.dialects.postgresql import UUID as sa_UUID
 from sqlmodel import Field, Relationship, SQLModel, Session
 from uuid import UUID, uuid4
 
@@ -13,12 +15,15 @@ from plants_api.database import SessionLocal
 
 logger = logging.getLogger(__name__)
 
+
 class BaseTable(SQLModel):
-    id: UUID | None = Field(default_factory=uuid4, 
-                            primary_key=True,
-                            exclude=True,
-                            )
-    
+    pk: UUID | None = Field(
+        default_factory=uuid4,
+        alias="id",
+        primary_key=True,
+        exclude=True,
+    )
+
     def create(self):
         logger.info("create in base class")
 
@@ -30,33 +35,42 @@ class BaseTable(SQLModel):
             session.refresh(self)
         return self
 
+
 class BaseReader(SQLModel):
-    id: UUID = Field(default_factory=uuid4, 
-                            primary_key=True,
+    pk: UUID = Field(
+        default_factory=uuid4,
+        alias="id",
+        primary_key=True,
+        # exclude=True,
     )
+
 
 class PlantBase(SQLModel):
     latin_name: str = Field(index=True, unique=True)
     min_germination_temp: int | None = Field(default=None)
-    max_germination_temp: int | None = Field()
-    min_soil_temp_transplant: int | None = Field()
-    max_soil_temp_transplant: int | None = Field()
+    max_germination_temp: int | None = Field(default=None)
+    min_soil_temp_transplant: int | None = Field(default=None)
+    max_soil_temp_transplant: int | None = Field(default=None)
+
 
 class Plant(BaseTable, PlantBase, table=True):
     pass
 
+
 class PlantList:
     items: list[Plant]
+
 
 class PlantCreate(PlantBase):
     # common_names: list["PlantName"] = Relationship(back_populates="plant")
     pass
 
+
 class PlantListItem(BaseReader):
     latin_name: str = Field(index=True, unique=True)
-    
 
-class PlantRead(PlantBase, BaseReader):
+
+class PlantRead(BaseReader, PlantBase):
     # common_names: list["PlantName"] = Relationship(back_populates="plant")
     pass
 
@@ -74,4 +88,3 @@ class PlantRead(PlantBase, BaseReader):
 
 # class PlantNameRead(PlantNameBase, BaseReader):
 #     plant: Plant | None = Relationship(back_populates="common_names")
-

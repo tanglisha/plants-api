@@ -6,6 +6,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def get_app():
     app = FastAPI(
         title="Plants",
@@ -13,6 +14,7 @@ def get_app():
     )
     app.include_router(plants_router)
     return app
+
 
 app = get_app()
 
