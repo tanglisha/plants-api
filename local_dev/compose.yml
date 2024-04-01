@@ -7,20 +7,27 @@ services:
     build:
       context: ..
       dockerfile: local_dev/Dockerfile
-    command: poetry run uvicorn main:app --host 0.0.0.0 --port 8000
+    # command: poetry run uvicorn main:app --host 0.0.0.0 --port 8000 --reload --reload-dir="/app/plants_api"
+    command: start-app
     working_dir: /app/plants_api
     develop:
       watch:
-        - path: ../plants_api
-          action: sync
-          target: app/plants_api
-        - path: ../tests
-          action: sync
-          target: app/tests
+        - action: sync
+          path: ../plants_api/ # local
+          target: /app/plants_api/ # container
+          ignore:
+            - __pycache__
+        - action: sync
+          path: ../tests/ # local
+          target: /app/tests/ # container
+          ignore:
+            - __pycache__
     environment:
       POSTGRES_USER: postgres
       # POSTGRES_PASSWORD: /run/secrets/db_password
       POSTGRES_PASSWORD: postgres
+      ENVIRONMENT: DEV
+      CONTAINER: true
 
     # secrets:
       # - db_password
@@ -37,7 +44,7 @@ services:
     container_name: db
     image: bitnami/postgresql:latest
     restart: always
-    # user: "1001:0" # Colima won't mount the data directory without this
+    user: "1001:0" # Colima won't mount the data directory without this
     environment:
       POSTGRESQL_USERNAME: postgres
       POSTGRESQL_PASSWORD: postgres
@@ -56,6 +63,8 @@ services:
     #   - db_password
     ports:
       - '5432:5432'
+    expose:
+      - 5432
     volumes: 
       - type: bind
         source: "./db/data"
