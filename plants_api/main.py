@@ -1,7 +1,7 @@
+import logging
+
 from fastapi import FastAPI
 from plants_api.router import router as plants_router
-
-import logging
 
 logger = logging.getLogger(__name__)
 

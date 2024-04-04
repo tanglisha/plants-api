@@ -1,12 +1,12 @@
 import logging
-from sqlalchemy.dialects.postgresql import UUID
-from sqlmodel import Field
-from uuid import UUID, uuid4
-
-import logging
+from uuid import UUID
+from uuid import uuid4
 
 from plants_api.database import SessionLocal
 from plants_api.model_base import SQLModel
+from sqlmodel import Field
+
+# from sqlalchemy.dialects.postgresql import UUID
 
 logger = logging.getLogger(__name__)
 

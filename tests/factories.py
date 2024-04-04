@@ -1,15 +1,16 @@
-from factory import Factory, Faker
-from factory.fuzzy import FuzzyInteger, FuzzyText
-
-from plants_api.plants.models import PlantCreate, PlantRead, Plant
-
+from factory import Factory
+from factory import Faker
+from factory.fuzzy import FuzzyInteger
+from plants_api.plants.models import Plant
+from plants_api.plants.models import PlantCreate
+from plants_api.plants.models import PlantRead
 
 
 class PlantBaseFactory(Factory):
-    class Meta:
+    class Meta:  # type:ignore
         model = Plant
 
-    latin_name = FuzzyText()
+    latin_name = Faker("sentence", nb_words=3, variable_nb_words=True)
 
     min_germination_temp = FuzzyInteger(0, 40)
     max_germination_temp = FuzzyInteger(41, 85)
@@ -21,39 +22,21 @@ class PlantBaseFactory(Factory):
 
 
 class PlantFactory(PlantBaseFactory):
-    class Meta:
+    class Meta:  # type:ignore
         model = Plant
 
     pk = Faker("uuid4")
 
 
-# class PlantFactory(BaseFactory[Plant]):
-#     __model__ = Plant
-#     __allow_none_optionals___ = False
-
-#     name = Use(BaseFactory.__random__.choice, ["Ralph", "Roxy"])
-
-# class PlantFactory(SQLAlchemyFactory[Plant]):
-#     ...
-
-
 class PlantCreateFactory(PlantBaseFactory):
-    class Meta:
+    class Meta:  # type:ignore
         model = PlantCreate
 
     pk = None
 
 
-# class PlantCreateFactory(BaseFactory[PlantCreate]):
-#     ...
-
-
 class PlantReadFactory(PlantBaseFactory):
-    class Meta:
+    class Meta:  # type:ignore
         model = PlantRead
 
     pk = Faker("uuid4")
-
-
-# class PlantReadFactory(BaseFactory[PlantRead]):
-#     ...

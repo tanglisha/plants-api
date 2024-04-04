@@ -1,21 +1,20 @@
+import logging
 from enum import Enum
 from http import HTTPStatus
 from uuid import UUID
-from fastapi import APIRouter, Depends, HTTPException
-from sqlmodel import select
 
-from plants_api.database import SessionLocal, db
-from plants_api.plants.models import (
-    Plant,
-    PlantCreate,
-    PlantListItem,
-    PlantRead,
-    PlantUpdate,
-)
-
-import logging
-
+from fastapi import APIRouter
+from fastapi import Depends
+from fastapi import HTTPException
+from plants_api.database import db
+from plants_api.database import SessionLocal
+from plants_api.plants.models import Plant
+from plants_api.plants.models import PlantCreate
+from plants_api.plants.models import PlantListItem
+from plants_api.plants.models import PlantRead
+from plants_api.plants.models import PlantUpdate
 from plants_api.tags import Tags
+from sqlmodel import select
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +31,9 @@ def create_plant(plant: PlantCreate, db_conn=Depends(db)):
 
 @router.patch("/{plant_id}", response_model=PlantRead, tags=tags)
 def plant_update(
-    plant_id: UUID, plant: PlantUpdate, db_conn: SessionLocal = Depends(db)
+    plant_id: UUID,
+    plant: PlantUpdate,
+    db_conn: SessionLocal = Depends(db),
 ):
     plant.pk = plant.pk or plant_id
 
@@ -51,13 +52,13 @@ def plant_update(
 
 @router.get("/", response_model=list[PlantListItem], tags=tags)
 def plant_list(db=Depends(db)):
-    return db.execute(select(Plant.pk, Plant.latin_name)).all()
+    return db.execute(select(Plant)).all()
 
 
 @router.get("/{plant_id}", response_model=PlantRead, tags=tags)
 def plant_read(plant_id: UUID, db=Depends(db)):
     resp = db.execute(
-        (select(Plant).where(Plant.pk == plant_id).offset(0).limit(100))
+        select(Plant).where(Plant.pk == plant_id).offset(0).limit(100),
     ).first()
     if not resp:
         raise HTTPException(404)

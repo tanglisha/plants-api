@@ -28,12 +28,12 @@ module.exports = {
 
   // See https://nightwatchjs.org/guide/extending-nightwatch/adding-plugins.html
   plugins: [],
-  
+
   // See https://nightwatchjs.org/guide/concepts/test-globals.html#external-test-globals
   globals_path : '',
 
   webdriver: {},
-  
+
   test_workers: {
     enabled: true,
     workers: 'auto'

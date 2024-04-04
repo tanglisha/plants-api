@@ -1,6 +1,6 @@
 
 # Mac troubleshooting
-If you get an error like `OCI runtime create failed: runc create failed: unable to start container process: exec: "cd": executable file not found in $PATH: unknown` 
+If you get an error like `OCI runtime create failed: runc create failed: unable to start container process: exec: "cd": executable file not found in $PATH: unknown`
 when bringing up the database, you need to set the userid of your data directories.
 
 From the docs:
@@ -14,7 +14,7 @@ sudo chmod -R 777 db
 ```
 
 
-Docker Lock file: ~/Library/Application\ Support/com.docker.compose/plants-api.pid  
+Docker Lock file: ~/Library/Application\ Support/com.docker.compose/plants-api.pid
 
 # Alembic
 ## Create a migration

@@ -1,11 +1,11 @@
-from sqlalchemy import Engine, create_engine
+import logging
+import os
+
+from sqlalchemy import create_engine
+from sqlalchemy import Engine
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlmodel import Session
-import os
-
-
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +37,7 @@ class SessionLocal(Session):
         return cls._create_session()
 
     @classmethod
-    def _create_session(self):
+    def _create_session(cls):
         return sessionmaker(autocommit=False, autoflush=False, bind=cls._engine())()
 
     @classmethod

@@ -1,12 +1,18 @@
-from uuid import uuid4
-from pytest import fixture
-from mock import MagicMock, patch
-from fastapi.testclient import TestClient
-from plants_api.database import SessionLocal, db as real_db
 import json
+from unittest.mock import MagicMock
+from unittest.mock import patch
+from uuid import uuid4
+
+from fastapi.testclient import TestClient
+from plants_api.database import db as real_db
+from plants_api.database import SessionLocal
 from plants_api.main import app
 from plants_api.plants.models import PlantRead
-from .factories import PlantCreateFactory, PlantReadFactory, PlantFactory
+from pytest import fixture
+
+from .factories import PlantCreateFactory
+from .factories import PlantFactory
+from .factories import PlantReadFactory
 
 client = TestClient(app)
 
@@ -20,7 +26,9 @@ def fake_db():
     returns a MagicMock in place of the session
     """
     with patch.object(
-        SessionLocal, "_create_session", name="fake session"
+        SessionLocal,
+        "_create_session",
+        name="fake session",
     ) as fake_engine:
         yield fake_engine
 
@@ -46,7 +54,8 @@ class TestPlant:
         def test_basic_creation(self, fake_db):
             request_body = PlantCreateFactory.build()
             response = PlantRead.model_validate(
-                request_body.model_dump(), update={"pk": uuid4()}
+                request_body.model_dump(),
+                update={"pk": uuid4()},
             )
 
             fake_db.refresh.side_effect = response
@@ -58,7 +67,9 @@ class TestPlant:
 
             assert subject.status_code == 200
             assert json_equal_minus_keys(
-                subject.json(), response.model_dump_json(), "pk"
+                subject.json(),
+                response.model_dump_json(),
+                "pk",
             )
 
     class TestUpdate:
@@ -94,7 +105,7 @@ class TestPlant:
             expected_result = []
             for item in [json.loads(x.model_dump_json()) for x in response]:
                 expected_result.append(
-                    {"pk": item.get("pk"), "latin_name": item.get("latin_name")}
+                    {"pk": item.get("pk"), "latin_name": item.get("latin_name")},
                 )
             db.execute.return_value.all.return_value = response
 

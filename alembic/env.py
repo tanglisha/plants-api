@@ -1,17 +1,14 @@
 from logging.config import fileConfig
 
+from alembic import context
+from plants_api.database import SessionLocal
+from plants_api.model_base import SQLModel
+from plants_api.plants.models import *
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
-from alembic import context
-
-from plants_api.database import SessionLocal
-
 # Base model - we subclassed SQLModel
-from plants_api.model_base import SQLModel
-
 # Flexible import of all table models from this file
-from plants_api.plants.models import *
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

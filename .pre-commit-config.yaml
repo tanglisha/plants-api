@@ -1,0 +1,47 @@
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+    -   id: check-yaml
+    -   id: end-of-file-fixer
+    -   id: trailing-whitespace
+-   repo: https://github.com/asottile/reorder-python-imports
+    rev: v3.12.0
+    hooks:
+    -   id: reorder-python-imports
+        exclude: "alembic"
+        args:
+        -   --py38-plus
+        -   --application-directories
+        -   plants_api
+        -   --py312-plus
+
+-   repo: https://github.com/asottile/pyupgrade
+    rev: v3.15.2
+    hooks:
+    -   id: pyupgrade
+        args:
+        -   --py310-plus
+-   repo: https://github.com/asottile/add-trailing-comma
+    rev: v3.1.0
+    hooks:
+    -   id: add-trailing-comma
+-   repo: https://github.com/abravalheri/validate-pyproject
+    rev: v0.16
+    hooks:
+    -   id: validate-pyproject
+-   repo: https://github.com/fsouza/mirrors-pyright
+    rev: v1.1.357
+    hooks:
+    -   id: pyright
+-   repo: https://github.com/PyCQA/autoflake
+    rev: v2.3.1
+    hooks:
+    -   id: autoflake
+        args: ["--exclude", "alembic/*"]
+-   repo: https://github.com/psf/black-pre-commit-mirror
+    rev: 'refs/tags/24.3.0:refs/tags/24.3.0' # version is 24.3.0 - using that is broken
+    hooks:
+      - id: black
+        language_version: python3.12
+        args: ["--force-exclude", "alembic"]
