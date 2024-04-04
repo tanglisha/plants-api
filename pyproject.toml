@@ -21,7 +21,20 @@ alembic = "^1.13.1" # database migrations
 factory-boy = "^3.3.0"
 mock-alchemy = "^0.2.6"
 mock = "^5.1.0"
+autoflake = "^2.3.1"
+
+[tool.autoflake]
+check = true
+remove-all-unused-imports = true
+remove-unused-variables = true
+remove-duplicate-keys = true
+ignore-init-module-imports = true
+ignore-pass-statements = true
+recursive = true
+exclude = ["alembic/env"]
+in-place = true
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+

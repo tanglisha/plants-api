@@ -1,7 +1,4 @@
-from http import HTTPStatus
 import logging
-from fastapi import HTTPException
-from pytest import param
 from sqlalchemy.dialects.postgresql import UUID
 from sqlmodel import Field
 from uuid import UUID, uuid4

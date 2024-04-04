@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-from plants_api.database import SessionLocal
 from plants_api.router import router as plants_router
 
 import logging

@@ -1,36 +1,34 @@
 ---
 name: plants-api
 
+# This configuration is for testing and is insecure
+
 services:
   app:
     container_name: app
     build:
       context: ..
       dockerfile: local_dev/Dockerfile
-    # command: poetry run uvicorn main:app --host 0.0.0.0 --port 8000 --reload --reload-dir="/app/plants_api"
     command: start-app
     working_dir: /app/plants_api
     develop:
       watch:
         - action: sync
-          path: ../plants_api/ # local
+          path: ../plants_api/ # host machine
           target: /app/plants_api/ # container
           ignore:
             - __pycache__
         - action: sync
-          path: ../tests/ # local
+          path: ../tests/ # host machine
           target: /app/tests/ # container
           ignore:
             - __pycache__
     environment:
       POSTGRES_USER: postgres
-      # POSTGRES_PASSWORD: /run/secrets/db_password
       POSTGRES_PASSWORD: postgres
       ENVIRONMENT: DEV
       CONTAINER: true
 
-    # secrets:
-      # - db_password
     ports:
       - target: 8000 # container
         published: 8001 # host machine
@@ -59,8 +57,6 @@ services:
       interval: 15s
       timeout: 5s
       retries: 6
-    # secrets:
-    #   - db_password
     ports:
       - '5432:5432'
     expose:
@@ -70,18 +66,11 @@ services:
         source: "./db/data"
         target: "/var/lib/postgres/data"
         read_only: false
-    #   - "/var/run/postgres/postgres.sock:/var/run/postgres/postgres.sock"
-    #   - ./data:/var/lib/postgresql/data
-    #   - ./db:/bitnami/postgresql
+      # - ./db/data:/var/lib/postgresql/data
+      - ./db:/bitnami/postgresql
     #   I think it's trying to change the ownership of my host /var/lib/postgresql/data - not sure why
     #   - ./db/entrypoint:/docker-entrypoint-initdb.d
 
 # volumes:
 #   db:
 #     driver: local
-
-# secrets:
-#    db_password:
-#      file: db_password.txt
-#    db_root_password:
-#      file: local_dev/db_root_password.txt

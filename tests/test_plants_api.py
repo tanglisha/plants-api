@@ -1,14 +1,12 @@
 from uuid import uuid4
 from pytest import fixture
-from mock import MagicMock, mock, patch
+from mock import MagicMock, patch
 from fastapi.testclient import TestClient
-from sqlalchemy import null
 from plants_api.database import SessionLocal, db as real_db
 import json
 from plants_api.main import app
 from plants_api.plants.models import PlantRead
 from .factories import PlantCreateFactory, PlantReadFactory, PlantFactory
-from plants_api.plants.models import Plant
 
 client = TestClient(app)
 

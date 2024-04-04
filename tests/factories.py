@@ -1,11 +1,8 @@
 from factory import Factory, Faker
 from factory.fuzzy import FuzzyInteger, FuzzyText
-from polyfactory import Use
 
 from plants_api.plants.models import PlantCreate, PlantRead, Plant
 
-from polyfactory.factories import BaseFactory
-from polyfactory.factories.sqlalchemy_factory import SQLAlchemyFactory
 
 
 class PlantBaseFactory(Factory):
