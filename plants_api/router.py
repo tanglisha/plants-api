@@ -1,10 +1,17 @@
 from enum import Enum
+from http import HTTPStatus
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import select
 
 from plants_api.database import SessionLocal, db
-from plants_api.plants.models import Plant, PlantCreate, PlantListItem, PlantRead
+from plants_api.plants.models import (
+    Plant,
+    PlantCreate,
+    PlantListItem,
+    PlantRead,
+    PlantUpdate,
+)
 
 import logging
 
@@ -19,8 +26,27 @@ tags: list[str | Enum] = [
 
 
 @router.post("/", response_model=PlantRead, tags=tags)
-def create_plant(plant: PlantCreate):
-    return Plant.model_validate(plant).create()
+def create_plant(plant: PlantCreate, db_conn=Depends(db)):
+    return Plant.model_validate(plant).create(db_conn)
+
+
+@router.patch("/{plant_id}", response_model=PlantRead, tags=tags)
+def plant_update(
+    plant_id: UUID, plant: PlantUpdate, db_conn: SessionLocal = Depends(db)
+):
+    plant.pk = plant.pk or plant_id
+
+    db_plant: Plant = db_conn.get_one(Plant, plant_id)  # , with_for_update=True)
+
+    if not db_plant:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="plant not found")
+    data = plant.model_dump(exclude_defaults=True, exclude_unset=True)
+    for k, v in data.items():
+        if v:
+            db_plant.__setattr__(k, v)
+    db_conn.commit()
+    db_conn.refresh(db_plant)
+    return db_plant
 
 
 @router.get("/", response_model=list[PlantListItem], tags=tags)

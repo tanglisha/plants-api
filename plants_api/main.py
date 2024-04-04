@@ -17,6 +17,3 @@ def get_app():
 
 
 app = get_app()
-
-
-SessionLocal.init_db()

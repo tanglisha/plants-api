@@ -36,27 +36,25 @@ class SessionLocal(Session):
         def get(db=Depends(SessionLocal))
     """
 
-    def __init__(self):
-        print("creating real database session")
-
     def __new__(cls):
         # Sets up the current session with the engine info
-        session = sessionmaker(autocommit=False, autoflush=False, bind=cls._engine())
+        return cls._create_session()
 
-        return session()
+    @classmethod
+    def _create_session(self):
+        return sessionmaker(autocommit=False, autoflush=False, bind=cls._engine())()
+
+    @classmethod
+    def connection_url(cls) -> str:
+        return f"postgresql+pg8000://{user}:{password}@{DATABASE_URL}/{db_name}"
 
     @classmethod
     def _engine(cls) -> Engine:
         result = create_engine(
-            url=f"postgresql+pg8000://{user}:{password}@{DATABASE_URL}/{db_name}",
+            url=cls.connection_url(),
             echo=True,
         )
         return result
-
-    @classmethod
-    def init_db(cls):
-        with cls._engine().begin() as conn:
-            SQLModel.metadata.create_all(conn)
 
 
 engine = create_engine(

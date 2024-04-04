@@ -1,17 +1,15 @@
+from http import HTTPStatus
 import logging
-from typing import TYPE_CHECKING
-from unittest.mock import Base
-import pg8000
-from pydantic import UUID4, computed_field
+from fastapi import HTTPException
 from pytest import param
-from sqlalchemy import Column, String
-from sqlalchemy.dialects.postgresql import UUID as sa_UUID
-from sqlmodel import Field, Relationship, SQLModel, Session
+from sqlalchemy.dialects.postgresql import UUID
+from sqlmodel import Field
 from uuid import UUID, uuid4
 
 import logging
 
 from plants_api.database import SessionLocal
+from plants_api.model_base import SQLModel
 
 logger = logging.getLogger(__name__)
 
@@ -24,36 +22,29 @@ class BaseTable(SQLModel):
         exclude=True,
     )
 
-    def create(self):
+    def create(self, session: SessionLocal):
         logger.info("create in base class")
 
-        # if not self.id:
-        # self.id = uuid4()
-        with SessionLocal() as session:
-            session.add(self)
-            session.commit()
-            session.refresh(self)
+        session.add(self)
+        session.commit()
+        session.refresh(self)
         return self
-
-
-class BaseReader(SQLModel):
-    pk: UUID = Field(
-        default_factory=uuid4,
-        alias="id",
-        primary_key=True,
-        # exclude=True,
-    )
 
 
 class PlantBase(SQLModel):
     latin_name: str = Field(index=True, unique=True)
-    min_germination_temp: int | None = Field(default=None)
+    min_germination_temp: int | None = Field(
+        default=None,
+        title="max germination temperature in f",
+        gt=0,
+        lt=100,
+    )
     max_germination_temp: int | None = Field(default=None)
     min_soil_temp_transplant: int | None = Field(default=None)
     max_soil_temp_transplant: int | None = Field(default=None)
 
 
-class Plant(BaseTable, PlantBase, table=True):
+class Plant(PlantBase, BaseTable, table=True):
     pass
 
 
@@ -66,13 +57,22 @@ class PlantCreate(PlantBase):
     pass
 
 
-class PlantListItem(BaseReader):
-    latin_name: str = Field(index=True, unique=True)
+class PlantUpdate(BaseTable, table=False):
+    latin_name: str | None = None
+    min_germination_temp: int | None = None
+    max_germination_temp: int | None = None
+    min_soil_temp_transplant: int | None = None
+    max_soil_temp_transplant: int | None = None
 
 
-class PlantRead(BaseReader, PlantBase):
+class PlantListItem(SQLModel):
+    pk: UUID
+    latin_name: str
+
+
+class PlantRead(PlantBase):
     # common_names: list["PlantName"] = Relationship(back_populates="plant")
-    pass
+    pk: UUID
 
 
 # class PlantNameBase(SQLModel):

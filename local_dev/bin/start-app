@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+# Run the application using poetry
+
+reload=""
+
+if [ -n ${ENVIRONMENT+x} ] && [ ${ENVIRONMENT} == "DEV" ] ; then
+    reload='--reload' # --reload-dir="/app/plants_api"'
+    echo "Running in Dev mode"
+fi
+
+poetry run uvicorn main:app --host 0.0.0.0 --port 8000 "${reload}" --reload
