@@ -8,7 +8,7 @@ authors = ["Liz Dahlstrom"]
 [tool.poetry.dependencies]
 python = "^3.12"
 fastapi = "0.110.1" # application framework
-sqlmodel = "^0.0.14" # model database tables as classes
+sqlmodel = "0.0.16" # model database tables as classes
 pg8000 = "^1.30.5" # postgres connector
 
 [tool.poetry.group.dev.dependencies]
@@ -16,12 +16,12 @@ alembic = "^1.13.1" # database migrations
 autoflake = "^2.3.1" # remove unused imports
 black = "24.4.0" # linter
 factory-boy = "^3.3.0" # fake objects for testing
-httpx = "^0.26.0" # async db toolkit
+httpx = "0.27.0" # async db toolkit
 mock = "^5.1.0" # fake responses for tests
 mypy = "^1.8.0"   # type checker
 pre-commit = "^3.7.0" # run checks before committing
 pytest = "^8.0.0" # testing framework
-uvicorn = "^0.27.0" # application engine
+uvicorn = "0.29.0" # application engine
 
 [tool.autoflake]
 check = true

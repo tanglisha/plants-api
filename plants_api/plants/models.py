@@ -4,6 +4,7 @@ from uuid import uuid4
 
 from plants_api.model_base import SQLModel
 from sqlmodel import Field
+from sqlmodel import Relationship
 
 # from sqlalchemy.dialects.postgresql import UUID
 
@@ -52,12 +53,12 @@ class PlantBase(SQLModel):
 
 
 class Plant(PlantBase, BaseTable, table=True):
-    pass
+    common_names: list["CommonName"] = Relationship(back_populates="plant")
 
 
 class PlantCreate(PlantBase):
-    min_germination_temp: int | None = None
-    # common_names: list["PlantName"] = Relationship(back_populates="plant")
+    # min_germination_temp: int | None = None
+    common_names: list["CommonName"] = Relationship(back_populates="plant")
 
 
 class PlantUpdate(BaseTable, table=False):
@@ -74,20 +75,23 @@ class PlantListItem(SQLModel):
 
 
 class PlantRead(PlantBase):
-    # common_names: list["PlantName"] = Relationship(back_populates="plant")
     pk: UUID
+    common_names: list["CommonName"] = Relationship(back_populates="plant")
 
 
-# class PlantNameBase(SQLModel):
-#     name: str = Field(index=True)
+class CommonNameBase(SQLModel):
+    name: str = Field(index=True)
 
-#     plant_id: UUID | None = Field(foreign_key="plant.id")
+    plant_id: UUID | None = Field(foreign_key="plant.pk", nullable=False)
 
-# class PlantName(BaseTable, PlantNameBase, table=True):
-#     pass
 
-# class PlantNameCreate(PlantNameBase):
-#     plant: Plant | None = Relationship(back_populates="common_names")
+class CommonName(BaseTable, CommonNameBase, table=True):
+    plant: Plant | None = Relationship(back_populates="common_names")
 
-# class PlantNameRead(PlantNameBase, BaseReader):
-#     plant: Plant | None = Relationship(back_populates="common_names")
+
+class CommonNameCreate(CommonNameBase):
+    plant: Plant | None = Relationship(back_populates="common_names")
+
+
+class CommonNameRead(CommonNameBase):
+    plant: Plant | None = Relationship(back_populates="common_names")
