@@ -21,8 +21,7 @@ RUN useradd --create-home --shell /bin/bash "${USERNAME}" && \
     chown -R "${USERNAME}:${USERNAME}" "${APPDIR}" && \
     python -m pip install poetry && \
     apt-get update && \
-    apt-get install -y python3-tk && \
-    apt-get install -y postgresql && \
+    apt-get install -y python3-tk posgresql idna && \
     rm -r /var/lib/apt/lists/*
 
 # Switch to the non-root user
