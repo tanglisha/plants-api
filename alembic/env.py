@@ -1,9 +1,9 @@
 from logging.config import fileConfig
 
 from alembic import context
-from plants_api.database import SessionLocal
+from plants_api.database import connection_string
 from plants_api.model_base import SQLModel
-from plants_api.plants.models import *
+from plants_api.plants.models import * # noqa
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
@@ -13,7 +13,7 @@ from sqlalchemy import pool
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
-url = SessionLocal.connection_url()
+url = connection_string
 config.set_main_option("sqlalchemy.url", url)
 
 # Interpret the config file for Python logging.

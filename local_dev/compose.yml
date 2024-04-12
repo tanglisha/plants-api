@@ -67,7 +67,7 @@ services:
         target: "/var/lib/postgres/data"
         read_only: false
       # - ./db/data:/var/lib/postgresql/data
-      - ./db:/bitnami/postgresql
+      # - ./db:/bitnami/postgresql
     #   I think it's trying to change the ownership of my host /var/lib/postgresql/data - not sure why
     #   - ./db/entrypoint:/docker-entrypoint-initdb.d
 

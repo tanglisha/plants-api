@@ -31,7 +31,7 @@ remove-duplicate-keys = true
 ignore-init-module-imports = true
 ignore-pass-statements = true
 recursive = true
-exclude = [".venv", ".vscode", ".pytest_cache", "*.__pycache__", "alembic/*"]
+exclude = [".venv", ".vscode", ".pytest_cache", "*.__pycache__"]
 in-place = true
 
 [tool.black]

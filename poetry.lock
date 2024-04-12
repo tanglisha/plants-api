@@ -512,20 +512,6 @@ docs = ["sphinx"]
 test = ["pytest", "pytest-cov"]
 
 [[package]]
-name = "mock-alchemy"
-version = "0.2.6"
-description = "SQLAlchemy mock helpers."
-optional = false
-python-versions = ">=3.7,<4.0"
-files = [
-    {file = "mock_alchemy-0.2.6-py3-none-any.whl", hash = "sha256:d5e17f2c92d0299d70cd9a0d3c8f96f759a81c285c76b03f4192451583bf865f"},
-    {file = "mock_alchemy-0.2.6.tar.gz", hash = "sha256:807cc2bd7f658fb98292900052eaa6eeb4a65b2d62364e639462480a275299ef"},
-]
-
-[package.dependencies]
-SQLAlchemy = ">=2.0.6,<3.0.0"
-
-[[package]]
 name = "mypy"
 version = "1.9.0"
 description = "Optional static typing for Python"
@@ -1119,4 +1105,4 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "1c6e349b50e471dbc988a1632945d0136b035304df30c54089958dc186f3371a"
+content-hash = "22edc9ab4be2f59e347d4543ca9ce58aa2e323d6aa326bc03cbd2566efad355a"

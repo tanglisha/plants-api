@@ -46,7 +46,12 @@ repos:
     rev: v2.3.1
     hooks:
     -   id: autoflake
-        args: ["--exclude", "alembic/*"]
+        args:
+        - --remove-unused-variables
+        - --remove-all-unused-imports
+        - --in-place
+        # - --exclude
+        # - alembic/*
 -   repo: https://github.com/psf/black-pre-commit-mirror
     rev: 'refs/tags/24.3.0:refs/tags/24.3.0' # version is 24.3.0 - using that is broken
     hooks:

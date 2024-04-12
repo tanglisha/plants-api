@@ -2,7 +2,6 @@ import logging
 from uuid import UUID
 from uuid import uuid4
 
-from plants_api.database import SessionLocal
 from plants_api.model_base import SQLModel
 from sqlmodel import Field
 
@@ -19,39 +18,46 @@ class BaseTable(SQLModel):
         exclude=True,
     )
 
-    def create(self, session: SessionLocal):
-        logger.info("create in base class")
-
-        session.add(self)
-        session.commit()
-        session.refresh(self)
-        return self
-
 
 class PlantBase(SQLModel):
     latin_name: str = Field(index=True, unique=True)
     min_germination_temp: int | None = Field(
         default=None,
         title="max germination temperature in f",
-        gt=0,
-        lt=100,
+        ge=0,
+        le=100,
+        nullable=True,
     )
-    max_germination_temp: int | None = Field(default=None)
-    min_soil_temp_transplant: int | None = Field(default=None)
-    max_soil_temp_transplant: int | None = Field(default=None)
+    max_germination_temp: int | None = Field(
+        default=None,
+        title="min germination temp in f",
+        ge=0,
+        le=100,
+        nullable=True,
+    )
+    min_soil_temp_transplant: int | None = Field(
+        default=None,
+        title="min soil temp for transplaning in f",
+        ge=0,
+        le=100,
+        nullable=True,
+    )
+    max_soil_temp_transplant: int | None = Field(
+        default=None,
+        title="max germination temp for transplanting in f",
+        ge=0,
+        le=100,
+        nullable=True,
+    )
 
 
 class Plant(PlantBase, BaseTable, table=True):
     pass
 
 
-class PlantList:
-    items: list[Plant]
-
-
 class PlantCreate(PlantBase):
+    min_germination_temp: int | None = None
     # common_names: list["PlantName"] = Relationship(back_populates="plant")
-    pass
 
 
 class PlantUpdate(BaseTable, table=False):

@@ -9,6 +9,7 @@ ARG APPDIR="/app"
 
 # Poetry won't ask for confirmations
 ENV POETRY_NO_INTERACTION=1
+ENV POETRY_VIRTUALENVS_PATH=/app/venv
 
 # cd to the code directory
 WORKDIR "${APPDIR}"
