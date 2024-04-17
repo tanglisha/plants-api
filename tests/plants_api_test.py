@@ -1,4 +1,5 @@
 import json
+from http import HTTPStatus
 from unittest.mock import patch
 from uuid import uuid4
 
@@ -7,36 +8,34 @@ from plants_api.main import app
 from plants_api.plants.models import PlantListItem
 from plants_api.plants.models import PlantRead
 from pytest import fixture
+from sqlalchemy.exc import NoResultFound
 from sqlmodel import Session
 
 from .factories import PlantCreateFactory
 from .factories import PlantFactory
-from .factories import PlantReadFactory
 
 client = TestClient(app)
-
-# db = MagicMock(name="fake database")
-
-
-# def override_database():
-#     """Override the Depends(db) functionality
-
-#     returns a MagicMock
-#     """
-#     yield db
-
-
-# app.dependency_overrides[real_db] = override_database
-
-
-@fixture(autouse=True)
-def engine():
-    with patch("sqlmodel.create_engine", name="Mock Engine") as fake_engine:
-        yield fake_engine
 
 
 @fixture(autouse=True)
 def db():
+    """Fake database
+
+    Override methods from this to change the responses from the database
+
+    == Example ==
+
+    Let's say we're calling the database using db.exec(some query).all()
+    We need a `return_value` each time a method is called, so we need both
+        ret = exec.return_value
+        and then from that response
+        ret.all.return_value = blah
+
+    Like so:
+
+    def test(db):
+        db.exec.return_value.all.return_value = []
+    """
     with patch(
         "plants_api.database.Session",
         name="Mock Session",
@@ -53,7 +52,7 @@ class TestPlant:
         pk values are created in the server, not passed in
         """
 
-        def test_basic_creation(self, db):
+        def test_basic_creation(self):
             request_body = PlantCreateFactory.build()
 
             subject = client.post(
@@ -76,6 +75,17 @@ class TestPlant:
         pk values are created in the server, not passed in
         """
 
+        def test_plant_not_found(self, db):
+            db.get_one.side_effect = NoResultFound()
+
+            subject = client.patch(
+                url=f"/plants/{uuid4()}",
+                json={"latin_name": "should fail"},
+            )
+
+            assert subject.status_code == HTTPStatus.NOT_FOUND
+            assert subject.json() == {"detail": "plant not found"}
+
         def test_name_update(self, db):
             plant_id = str(uuid4())
             new_name = "updated name"
@@ -93,7 +103,7 @@ class TestPlant:
                 json={"latin_name": new_name},
             )
 
-            assert subject.status_code == 200
+            assert subject.status_code == HTTPStatus.OK
             actual_response = PlantRead.model_validate(subject.json())
             assert actual_response == expected_response
 
@@ -111,12 +121,12 @@ class TestPlant:
                 url="/plants",
             )
 
-            assert subject.status_code == 200
+            assert subject.status_code == HTTPStatus.OK
             assert subject.json() == expected_result
 
     class TestRead:
         def test_returns_item(self, db):
-            response = PlantReadFactory.build()
+            response = PlantFactory.build()
             db.get_one.return_value = response
             url = f"/plants/{response.pk}"
 
@@ -124,8 +134,10 @@ class TestPlant:
                 url=url,
             )
 
-            assert subject.status_code == 200
-            assert subject.json() == json.loads(response.model_dump_json())
+            assert subject.status_code == HTTPStatus.OK
+            assert subject.json() == json.loads(
+                PlantRead.model_validate(response).model_dump_json(),
+            )
 
 
 def json_equal_minus_keys(json1: str | dict, json2: str | dict, *keys: str) -> bool:

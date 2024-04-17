@@ -6,8 +6,6 @@ from plants_api.model_base import SQLModel
 from sqlmodel import Field
 from sqlmodel import Relationship
 
-# from sqlalchemy.dialects.postgresql import UUID
-
 logger = logging.getLogger(__name__)
 
 
@@ -57,8 +55,7 @@ class Plant(PlantBase, BaseTable, table=True):
 
 
 class PlantCreate(PlantBase):
-    # min_germination_temp: int | None = None
-    common_names: list["CommonName"] = Relationship(back_populates="plant")
+    _sa_instance_state = None
 
 
 class PlantUpdate(BaseTable, table=False):
@@ -76,22 +73,23 @@ class PlantListItem(SQLModel):
 
 class PlantRead(PlantBase):
     pk: UUID
+
     common_names: list["CommonName"] = Relationship(back_populates="plant")
 
 
 class CommonNameBase(SQLModel):
     name: str = Field(index=True)
 
-    plant_id: UUID | None = Field(foreign_key="plant.pk", nullable=False)
+    plant_id: UUID = Field(foreign_key="plant.pk", nullable=False)
 
 
 class CommonName(BaseTable, CommonNameBase, table=True):
-    plant: Plant | None = Relationship(back_populates="common_names")
+    plant: Plant = Relationship(back_populates="common_names")
 
 
 class CommonNameCreate(CommonNameBase):
-    plant: Plant | None = Relationship(back_populates="common_names")
+    pass
 
 
 class CommonNameRead(CommonNameBase):
-    plant: Plant | None = Relationship(back_populates="common_names")
+    plant: Plant = Relationship(back_populates="common_names")
