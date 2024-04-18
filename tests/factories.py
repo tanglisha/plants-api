@@ -1,3 +1,5 @@
+import random
+
 from factory import Factory
 from factory import Faker
 from factory import LazyAttribute
@@ -40,11 +42,11 @@ class CommonNameCreateFactory(CommonNameBaseFactory):
     pk = None
 
 
-class CommonNameReadFactory(CommonNameBaseFactory):
+class CommonNameReadFactory(Factory):
     class Meta:  # type:ignore
         model = CommonName
 
-    pk = Faker("uuid4")
+    name = Faker("sentence", nb_words=3, variable_nb_words=True)
 
 
 class PlantBaseFactory(Factory):
@@ -69,8 +71,8 @@ class PlantFactory(PlantBaseFactory):
     common_names = RelatedFactoryList(
         factory="tests.factories.CommonNameFactory",
         factory_related_name="plant",
-        size=FuzzyInteger(0, 5).fuzz(),  # Try to be random for each instance
-        # size=random.randint(0, 5),
+        # size=FuzzyInteger(0, 5).fuzz(),  # Try to be random for each instance
+        size=random.randint(0, 5),
         _sa_instance_state="instance state from PlantFactory",
         plant_id="..pk",
     )
@@ -81,6 +83,14 @@ class PlantCreateFactory(PlantBaseFactory):
         model = PlantCreate
 
     pk = None
+
+    common_names = RelatedFactoryList(
+        factory="tests.factories.CommonNameCreateFactory",
+        factory_related_name="plant",
+        size=random.randint(0, 5),
+        _sa_instance_state="instance state from PlantFactory",
+        plant_id="..pk",
+    )
 
 
 class PlantReadFactory(PlantFactory):

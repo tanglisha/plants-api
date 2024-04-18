@@ -3,6 +3,7 @@ from uuid import UUID
 from uuid import uuid4
 
 from plants_api.model_base import SQLModel
+from sqlalchemy import UniqueConstraint
 from sqlmodel import Field
 from sqlmodel import Relationship
 
@@ -57,6 +58,8 @@ class Plant(PlantBase, BaseTable, table=True):
 class PlantCreate(PlantBase):
     _sa_instance_state = None
 
+    common_names: list[str] = Field(default=[])
+
 
 class PlantUpdate(BaseTable, table=False):
     latin_name: str | None = None
@@ -74,7 +77,7 @@ class PlantListItem(SQLModel):
 class PlantRead(PlantBase):
     pk: UUID
 
-    common_names: list["CommonName"] = Relationship(back_populates="plant")
+    common_names: list["CommonNameRead"] = []
 
 
 class CommonNameBase(SQLModel):
@@ -84,12 +87,14 @@ class CommonNameBase(SQLModel):
 
 
 class CommonName(BaseTable, CommonNameBase, table=True):
+    __table_args__ = (UniqueConstraint("plant_id", "name"),)
     plant: Plant = Relationship(back_populates="common_names")
 
 
-class CommonNameCreate(CommonNameBase):
-    pass
+class CommonNameCreate(SQLModel):
+    name: str = Field(index=True)
+    plant_id: UUID | None = Field(foreign_key="plant.pk")
 
 
-class CommonNameRead(CommonNameBase):
-    plant: Plant = Relationship(back_populates="common_names")
+class CommonNameRead(SQLModel):
+    name: str = Field(index=True)

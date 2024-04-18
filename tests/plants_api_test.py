@@ -127,17 +127,39 @@ class TestPlant:
     class TestRead:
         def test_returns_item(self, db):
             response = PlantFactory.build()
-            db.get_one.return_value = response
-            url = f"/plants/{response.pk}"
+            db.get.return_value = response
 
             subject = client.get(
-                url=url,
+                url=f"/plants/{response.pk}",
             )
 
             assert subject.status_code == HTTPStatus.OK
             assert subject.json() == json.loads(
                 PlantRead.model_validate(response).model_dump_json(),
             )
+
+        def test_does_not_exist(self, db):
+            response = PlantFactory.build()
+            db.get.return_value = None
+
+            subject = client.get(
+                url=f"/plants/{response.pk}",
+            )
+
+            assert subject.status_code == HTTPStatus.NOT_FOUND
+            assert subject.json() == {"detail": "plant not found"}
+
+        def test_returns_common_names(self, db):
+            response = PlantFactory.build()
+
+            db.get.return_value = response
+
+            subject = client.get(
+                url=f"/plants/{response.pk}",
+            )
+
+            assert subject.status_code == HTTPStatus.OK
+            assert subject.json().get("common_names") is not []
 
 
 def json_equal_minus_keys(json1: str | dict, json2: str | dict, *keys: str) -> bool:

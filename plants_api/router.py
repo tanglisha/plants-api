@@ -7,6 +7,8 @@ from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
 from plants_api.database import db
+from plants_api.plants.models import CommonName
+from plants_api.plants.models import CommonNameCreate
 from plants_api.plants.models import Plant
 from plants_api.plants.models import PlantCreate
 from plants_api.plants.models import PlantListItem
@@ -27,6 +29,11 @@ tags: list[str | Enum] = [
 
 @router.post("/", response_model=PlantRead, tags=tags)
 def create_plant(plant: PlantCreate, db_conn=Depends(db)):
+    names = []
+    for name in plant.common_names:
+        names.append(CommonNameCreate.model_construct(name=name))
+    plant.common_names = []
+
     if plant.min_germination_temp == 0:
         plant.min_germination_temp = None
     if plant.max_germination_temp == 0:
@@ -37,9 +44,14 @@ def create_plant(plant: PlantCreate, db_conn=Depends(db)):
         plant.max_soil_temp_transplant = None
 
     db_plant = Plant.model_validate(plant)
+    for name in names:
+        name.plant_id = db_plant.pk
+        db_name = CommonName.model_validate(name)
+        db_conn.add(db_name)
 
     db_conn.add(db_plant)
     db_conn.commit()
+
     return db_plant
 
 
@@ -73,7 +85,8 @@ def plant_list(db: Session = Depends(db)):
 
 @router.get("/{plant_id}", response_model=PlantRead, tags=tags)
 def plant_read(plant_id: UUID, db: Session = Depends(db)):
-    resp = db.get_one(Plant, plant_id)
+    resp = db.get(Plant, plant_id)
+
     if not resp:
-        raise HTTPException(404)
+        raise HTTPException(HTTPStatus.NOT_FOUND, detail="plant not found")
     return resp
